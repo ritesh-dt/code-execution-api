@@ -2,9 +2,13 @@
 # Created by https://www.toptal.com/developers/gitignore/api/flask,git,windows,macos,python,virtualenv,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=flask,git,windows,macos,python,virtualenv,visualstudiocode
 
+# Deta
+.space
+
 # Project
 extra/
 submissions/
+fast-venv/
 
 ### Flask ###
 instance/*
