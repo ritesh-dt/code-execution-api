@@ -45,12 +45,14 @@ headers = {
 supported_languages = {
     "C (GCC 10.2.0)": "c",
     "C++": "c++",
-    "Python 3 (3.10.0)": "python"
+    "Python 3 (3.10.0)": "python",
+    "Java (15.0.2)": "java"
 }
 versionIds = {
     "C (GCC 10.2.0)": "10.2.0",
     "C++": "10.2.0",
-    "Python 3 (3.10.0)": "3.10.0"
+    "Python 3 (3.10.0)": "3.10.0",
+    "Java (15.0.2)": "15.0.2"
 }
 
 @app.post("/check")
@@ -88,7 +90,10 @@ async def check(submission: Submission) -> Result:
 
         piston_task = loop.create_task(CallPiston(url, headers, body, stdin, stdout))
         piston_tasks.append(piston_task)
-        await asyncio.sleep(0.4)
+        if supported_languages[submission.language] == "java":
+            await asyncio.sleep(2)
+        else:
+            await asyncio.sleep(0.4)
     
     for task in piston_tasks:
         await task
@@ -128,6 +133,10 @@ async def CallPiston(url, headers, body, stdin, stdout):
                         "solved": False,
                         "output": response["compile"]["stderr"]
                     }
+                # elif response["run"]["signal"] == "SIGKILL":
+                #     print("SIGKILL status, calling Piston again")
+                    # await asyncio.sleep(1)
+                    # return await CallPiston(url, headers, body, stdin, stdout)
                 elif response["run"]["stderr"]:
                     result["test_case"] = {
                         "solved": False,
