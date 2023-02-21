@@ -91,7 +91,7 @@ async def check(submission: Submission) -> Result:
         piston_task = loop.create_task(CallPiston(url, headers, body, stdin, stdout))
         piston_tasks.append(piston_task)
         if supported_languages[submission.language] == "java":
-            await asyncio.sleep(2)
+            await asyncio.sleep(1.6)
         else:
             await asyncio.sleep(0.4)
     
