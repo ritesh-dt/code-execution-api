@@ -37,7 +37,7 @@ class Result(BaseModel):
 def home():
     return {"message": "Code execution API working!"}
 
-url = "https://emkc.org/api/v2/piston/execute"
+url = "http://139.144.12.161:2000/api/v2/execute"
 
 headers = {
     "Content-Type": "application/json"
@@ -72,7 +72,6 @@ async def check(submission: Submission) -> Result:
         "stdin": "",
         "args": [],
         "compile_timeout": 10000,
-        "run_timeout": 3000,
         "compile_memory_limit": -1,
         "run_memory_limit": -1
     }
@@ -90,10 +89,10 @@ async def check(submission: Submission) -> Result:
 
         piston_task = loop.create_task(CallPiston(url, headers, body, stdin, stdout))
         piston_tasks.append(piston_task)
-        if supported_languages[submission.language] == "java":
-            await asyncio.sleep(1.6)
-        else:
-            await asyncio.sleep(0.4)
+        # if supported_languages[submission.language] == "java":
+        #     await asyncio.sleep(1.6)
+        # else:
+        await asyncio.sleep(0.4)
     
     for task in piston_tasks:
         await task

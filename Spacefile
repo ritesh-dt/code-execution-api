@@ -1,9 +1,14 @@
 # Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
 v: 0
 micros:
-  - name: code-execution-api
-    src: .
-    engine: python3.9
+  - name: judge0-callback
+    src: ./src/node
+    engine: nodejs16
     primary: true
+    dev: "nodemon index.js"
+    run: "node index.js"
+  - name: code-execution-api
+    src: ./src/python
+    engine: python3.9
     public_routes:
       - "/*"

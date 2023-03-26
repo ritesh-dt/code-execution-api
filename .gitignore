@@ -5,6 +5,9 @@
 # Deta
 .space
 
+# NodeJS
+node_modules/
+
 # Project
 extra/
 submissions/
