@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fetch = require('node-fetch');
+require('dotenv').config();
 
 const { decode } = require("./utils/base64");
 const { CheckOutput } = require("./code_execution");
@@ -10,8 +11,10 @@ const app = express();
 let jsonParser = bodyParser.json();
 app.use(jsonParser);
 
+const JUDGE0_SERVER = process.env.JUDGE0_SERVER;
+
 const getExpectedOutput = async (token) => {
-    const url = "https://judge.coding-classroom.live/submissions/" + token + "?fields=expected_output";
+    const url = JUDGE0_SERVER + "/submissions/" + token + "?fields=expected_output";
     
     let response = await fetch(url);
     return await response.json();
@@ -21,10 +24,13 @@ app.get('/', (req, res) => {
     res.send('Judge0 callbacks at /check!');
 })
 
-app.post('/check', async (req, res) => {
+app.put('/check', async (req, res) => {
     // Coding Classroom details
     let submissionId = req.query["submissionId"];
     let testCaseIndex = req.query["testCaseIndex"];
+    
+    console.log(submissionId, testCaseIndex);
+    console.log(req.connection.remoteAddress, req.headers['x-forwarded-for']);
     
     if (!submissionId || !testCaseIndex) {
         res.status(404);
