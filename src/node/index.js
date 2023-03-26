@@ -14,8 +14,7 @@ app.use(jsonParser);
 const JUDGE0_SERVER = process.env.JUDGE0_SERVER;
 const SERVER_URL = process.env.SERVER_URL;
 const CALLBACK_RETRY = process.env.CALLBACK_RETRY || 3;
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const getExpectedOutput = async (token) => {
     const url = JUDGE0_SERVER + "/submissions/" + token + "?fields=expected_output";
@@ -58,11 +57,12 @@ app.put('/check', async (req, res) => {
         return;
     }
     
+    console.log(req.body);
     let result = req.body;
     
-    let output;
-    if (result["status"])
-        output = decode(result["stdout"]);
+    let output = "";
+    if (result["stdout"])
+        output += decode(result["stdout"]);
     if (result["status"]["id"] == 11)
         output += "\n" + decode(result["message"]);
     
