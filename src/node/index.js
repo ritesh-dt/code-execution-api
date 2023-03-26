@@ -12,12 +12,30 @@ let jsonParser = bodyParser.json();
 app.use(jsonParser);
 
 const JUDGE0_SERVER = process.env.JUDGE0_SERVER;
+const SERVER_URL = process.env.SERVER_URL;
+const CALLBACK_RETRY = process.env.CALLBACK_RETRY || 3;
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 
 const getExpectedOutput = async (token) => {
     const url = JUDGE0_SERVER + "/submissions/" + token + "?fields=expected_output";
     
     let response = await fetch(url);
     return await response.json();
+}
+
+const sendCallback = async (body) => {
+    const headers = {
+        'Content-Type': 'application/json'
+    }
+
+    let response = await fetch(SERVER_URL, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+    });
+    
+    return response.status == 200;
 }
 
 app.get('/', (req, res) => {
@@ -29,8 +47,8 @@ app.put('/check', async (req, res) => {
     let submissionId = req.query["submissionId"];
     let testCaseIndex = req.query["testCaseIndex"];
     
-    console.log(submissionId, testCaseIndex);
-    console.log(req.connection.remoteAddress, req.headers['x-forwarded-for']);
+    // console.log(submissionId, testCaseIndex);
+    // console.log(req.connection.remoteAddress, req.headers['x-forwarded-for']);
     
     if (!submissionId || !testCaseIndex) {
         res.status(404);
@@ -66,8 +84,24 @@ app.put('/check', async (req, res) => {
         response["solved"] = false;
     }
     
-    res.status(200);
-    res.send(response);
+    console.log(response);
+    
+    let callback_count = 0;
+    let success = false;
+    while (callback_count < CALLBACK_RETRY) {
+        let callback = await sendCallback(response);
+        if (callback) {
+            success = true;
+            break;
+        }
+        
+        callback_count += 1;
+    }
+    
+    if (success)
+        res.sendStatus(200);
+    else
+        res.sendStatus(500);
     return;
 })
 
