@@ -60,7 +60,9 @@ app.put('/check', async (req, res) => {
     
     let result = req.body;
     
-    let output = decode(result["stdout"]);
+    let output;
+    if (result["status"])
+        output = decode(result["stdout"]);
     if (result["status"]["id"] == 11)
         output += "\n" + decode(result["message"]);
     
